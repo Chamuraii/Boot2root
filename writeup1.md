@@ -98,6 +98,7 @@ We deduce that the password lenght is 12, ending with "wnage" and that we need t
 In order to automate the login attempts, we employed our own password generation script, and hydra, to brute force the attempts. The script generates every possible permutation of the left characters, joins it to the known piece of password, and hashes the result.
 
 ```python3 laurie.py | awk '{print $5}' > laurie_passwd.txt```
+
 ```hydra -l laurie -P ./laurie_passwd.txt <TargetIP> ssh -v```
 
 Hydra returns one successful login, using the string "Iheartpwnage", hashed.
