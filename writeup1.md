@@ -3,6 +3,7 @@
 As the network config changes depending on the virtualization system used, we start by getting our IP address and scanning the network
 
 ```ifconfig```
+
 ```nmap -T4 <Network>```
 
 ![](./img/01-ifconfig.png)
