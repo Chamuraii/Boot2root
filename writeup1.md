@@ -34,9 +34,9 @@ The directories /phpmyadmin and /webmail need authentication, we'll thus focus o
 
 In the /forum webpage, we found a list of users as well as some posts. One of those contains a log report, posted by lmezard. Reading carefully, we encountered a logging attempt from a user called "!q\]Ej?*5K5cy*AJ"
 
-*EXPLOITATION*
-
 ![](./img/06-forum_post.png)
+
+*EXPLOITATION*
 
 We intuit that the username was in fact a password. As the next succesfull login was done by lmezard, we could login with these credentials.
 
