@@ -109,7 +109,7 @@ The files present in laurie's home directory are a binary executable file called
 
 The bomb is a program composed of six levels, each one waiting for the user's input and, in case of error, exploding. The README helps us, giving us some hints and stating that, by joining the inputs used to defuse each phase, we can obtain thor's password.
 
-In order to understand how to solve each level, we decompiled the file using the online service "LINK".
+In order to understand how to solve each level, we decompiled the file using the online service "https://dogbolt.org/".
 
 ***Phases***
 
