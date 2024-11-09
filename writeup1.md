@@ -107,7 +107,7 @@ Hydra returns one successful login, using the string "Iheartpwnage", hashed.
 
 The files present in laurie's home directory are a binary executable file called "bomb" and a README, explaining us how to log in as the user thor.
 
-The bomb is a program composed of six levels, each one waiting for the user's input and, in case of error, exploding. The README helps us giving us some hints and stating that, by joining the inputs used to defuse each phase, we can obtain thor's password.
+The bomb is a program composed of six levels, each one waiting for the user's input and, in case of error, exploding. The README helps us, giving us some hints and stating that, by joining the inputs used to defuse each phase, we can obtain thor's password.
 
 In order to understand how to solve each level, we decompiled the file using the online service "LINK".
 
