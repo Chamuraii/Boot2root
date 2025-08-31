@@ -13,4 +13,4 @@ We decided to present our work in the form of a **penetration testing report**.
 
 1. **Alternative privilege escalation**: Gain root access using a different method.
 
-> ⚠️ We can't share the ISO file due to school policy restrictions
+> ⚠️ We can't upload the ISO file due to school policy restrictions
