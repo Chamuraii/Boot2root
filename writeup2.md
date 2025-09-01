@@ -1,6 +1,6 @@
 # ALTERNATIVE PRIV ESC
 
-Once we are in the system as www-data, we can check the kernel version using the following command 
+Once we are in the system as the user ```www-data```, we can check the kernel version using the following command 
 
 ```
 uname -a
